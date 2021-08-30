@@ -4,14 +4,14 @@ var mainWindow;
 
 function createWindow() {
   // Create the browser window.
-  const gotTheLock = app.requestSingleInstanceLock() // Used to check if app is already running
+  const gotTheLock = true //app.requestSingleInstanceLock() // Used to check if app is already running
 
   if (gotTheLock) { // Enters if no other instance of the app is running
     //Set up main window
     mainWindow = new BrowserWindow({
       webPreferences: {
         preload: path.join(app.getAppPath(), 'preload.js'),
-        devTools: false,
+        devTools: true,
         contextIsolation: false,
         nodeIntegration: true,
         backgroundColor: '#323232',
@@ -23,6 +23,7 @@ function createWindow() {
       height: 650,
       wdth: 800
     })
+    mainWindow.webContents.openDevTools()
 
     //Build Main Menu for App with Menus and Buttons
     setMainMenu();

@@ -495,6 +495,106 @@
 
       //This function handles all gamepad related stuff for the Driver user while sending the commands to the Host and updates the variables declared above.
       function startGamepadHandlerAndSocketThread() {
+        function startConn(g1) {
+          if (g1) {
+            userNumber = 1;
+            document.getElementById('roomCodeText').innerText = "Room Code: " + roomName + "  | Status: Connected | Gamepad User: " + userNumber;
+            window.logs.appendToLogFile('INFO - Gamepad User is now User 1 (632) \n');
+          } else {
+            userNumber = 2;
+            document.getElementById('roomCodeText').innerText = "Room Code: " + roomName + "  | Status: Connected | Gamepad User: " + userNumber;
+            window.logs.appendToLogFile('INFO - Gamepad User is now User 2 (636) \n');
+          }
+        }
+
+        //KEYBINDS
+        var keyMode = 0; // 0 if not set, 1 if in gamepad mode, 2 if in keyboard mode
+        function setKeyPressed(code, pressed) {
+          const mult = pressed ? 1 : 0;
+
+          switch (code) {
+            case 87: // W
+              if (LY != -1 * mult) {
+                LY = -1 * mult;
+                datachannel.send("G" + userNumber + "_LY_" + (LY));
+              }
+              break
+
+            case 83: // S
+              if (LY != 1 * mult) {
+                LY = 1 * mult;
+                datachannel.send("G" + userNumber + "_LY_" + (LY));
+              }
+              break
+
+            case 65: // A
+              if (LX != -1 * mult) {
+                LX = -1 * mult;
+                datachannel.send("G" + userNumber + "_LX_" + (LX));
+              }
+              break
+
+            case 68: // D
+              if (LX != 1 * mult) {
+                LX = 1 * mult;
+                datachannel.send("G" + userNumber + "_LX_" + (LX));
+              }
+              break
+
+            case 38: // Up arrow
+              if (RY != 1 * mult) {
+                RY = 1 * mult;
+                datachannel.send("G" + userNumber + "_RY_" + (RY));
+              }
+              break
+
+            case 40: // Down arrow
+              if (RY != -1 * mult) {
+                RY = -1 * mult;
+                datachannel.send("G" + userNumber + "_RY_" + (RY));
+              }
+              break
+
+            case 37: // Left arrow
+              if (RX != -1 * mult) {
+                RX = -1 * mult;
+                datachannel.send("G" + userNumber + "_RX_" + (RX));
+              }
+              break
+
+            case 39: // Left arrow
+              if (RX != 1 * mult) {
+                RX = 1 * mult;
+                datachannel.send("G" + userNumber + "_RX_" + (RX));
+              }
+              break
+
+            case 81: // Q
+              keyMode = 2;  
+              startConn(true);
+              break
+            
+            case 69: // E
+              keyMode = 2;
+              startConn(false);
+              break
+          }
+        }
+
+        window.onkeyup = function (e) {
+          if (keyMode == 1) {
+            return
+          }
+          setKeyPressed(e.keyCode, false);
+        }
+        window.onkeydown = function (e) {
+          if (keyMode == 1) {
+            return
+          }
+          setKeyPressed(e.keyCode, true);
+        }
+        // KEYBINDS
+
         // This function is only called when the Data Channel connection with the host has been OPENED
         window.logs.appendToLogFile("INFO - Successfully opened Gamepad Data Channel with Host (499) \n")
 
@@ -526,6 +626,10 @@
 
         // Constantly gets called by itself to keep updating as fast as possible
         function updateStatus() {
+          if (keyMode == 2) {
+            return
+          }
+
           scangamepads();
           for (j in controllers) {
             var controller = controllers[j];
@@ -627,13 +731,11 @@
             }
 
             if (START && A) {
-              userNumber = 1;
-              document.getElementById('roomCodeText').innerText = "Room Code: " + roomName + "  | Status: Connected | Gamepad User: " + userNumber;
-              window.logs.appendToLogFile('INFO - Gamepad User is now User 1 (632) \n');
+              keyMode = 1;
+              startConn(true)
             } else if (START && B) {
-              userNumber = 2;
-              document.getElementById('roomCodeText').innerText = "Room Code: " + roomName + "  | Status: Connected | Gamepad User: " + userNumber;
-              window.logs.appendToLogFile('INFO - Gamepad User is now User 2 (636) \n');
+              keyMode = 1;
+              startConn(false);
             }
 
             for (var i = 0; i < controller.axes.length; i++) { // 0 - leftX, 1 - leftY, 2 - rightX, 3 - rightY
