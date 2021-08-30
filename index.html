@@ -306,14 +306,22 @@
       inputUsernameField.hidden = false;
       inputUsernameField.placeholder = "Display Name";
 
-      window.fs.readFile(window.dir + '/TeleDrive/appData_Driver.txt', function (err, data) {
-        var parsedData = JSON.parse(data);
-        inputUsernameField.value = parsedData.localDisplayName;
-        inputField.value = parsedData.roomName;
-        if (!err) {
+      if (window.fs) {
+        window.fs.readFile(window.dir + '/TeleDrive/appData_Driver.txt', function (err, data) {
+          var parsedData = JSON.parse(data);
+          inputUsernameField.value = parsedData.localDisplayName;
+          inputField.value = parsedData.roomName;
+          if (!err) {
+            openRoomButton();
+          }
+        });
+      } else { // Web
+        inputUsernameField.value = window.localStorage.getItem("appdata_displayname");
+        inputField.value = window.localStorage.getItem("appdata_roomname");
+        if (inputField.value.length > 0) {
           openRoomButton();
         }
-      });
+      }
 
       document.getElementById('roomCode').hidden = true;
     }
@@ -360,7 +368,15 @@
 
     function openRoom() {
       inRoom = true;
-      window.logs.createLogFile();
+      if (window.logs) {
+        window.logs.createLogFile();
+      } else {
+        window.logs = {
+          appendToLogFile: (content) => {
+            console.log(content);
+          }
+        }
+      }
       if (isDriver) {
         //the Driver did not generate a room name, so it is set to what user inputted
         roomName = document.getElementById("inputField").value;
@@ -384,10 +400,15 @@
 
 
       if (isDriver) {
-        window.fs.writeFile(window.dir + '/TeleDrive/appData_Driver.txt', JSON.stringify({ localDisplayName, roomName }), function (err) {
-          if (err) throw err;
-          window.logs.appendToLogFile('INFO - Saved Driver App Data to load on next app run (389) \n');
-        });
+        if (window.fs) {
+          window.fs.writeFile(window.dir + '/TeleDrive/appData_Driver.txt', JSON.stringify({ localDisplayName, roomName }), function (err) {
+            if (err) throw err;
+            window.logs.appendToLogFile('INFO - Saved Driver App Data to load on next app run (389) \n');
+          });
+        } else { // Web
+          window.localStorage.setItem("appdata_displayname", localDisplayName);
+          window.localStorage.setItem("appdata_roomname", roomName);
+        }
       } else {
         window.fs.writeFile(window.dir + '/TeleDrive/appData_Host.txt', JSON.stringify({ localDisplayName, robotIPaddress, roomName }), function (err) {
           if (err) throw err;
@@ -451,9 +472,14 @@
 
           // Set up websocket connection with the signalling server and message all existing clients (if any) in the room 
           .then(() => {
-            serverConnection = new window.websocket('wss://' + WS_ADDR + ':' + WS_PORT, {
-              rejectUnauthorized: false
-            });
+            if (!window.websocket) {
+              serverConnection = new WebSocket('wss://' + WS_ADDR + ':' + WS_PORT);
+            } else {
+              serverConnection = new window.websocket('wss://' + WS_ADDR + ':' + WS_PORT, {
+                rejectUnauthorized: false
+              });
+            }
+            
             //Set up callback functions of the server in the case of message recieved, etc.
             serverConnection.onmessage = gotMessageFromServer;
             serverConnection.onopen = event => {
