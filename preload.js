@@ -14,7 +14,7 @@ window.fs = require("fs");
 window.udpSocket = {
     //Function to send gamepad data to socket at IP address provided by user and at port 11049
     sendDataToRobot: (ipAddress, message) => {
-        socket.send(Buffer.from(message), 11049, ipAddress, function (error) {
+        socket.send(Buffer.from(message), 11039, ipAddress, function (error) {
             if (error) {
                 console.log("Error relaying message to robot. Closing socket...");
             }
