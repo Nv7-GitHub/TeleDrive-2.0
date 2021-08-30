@@ -578,6 +578,62 @@
               keyMode = 2;
               startConn(false);
               break
+
+            case 90: // Z
+              if (A != pressed) {
+                A = pressed;
+                datachannel.send("G" + userNumber + "_A_" + (A ? "P" : "R"));
+              }
+              break
+
+            case 88: // X
+              if (B != pressed) {
+                B = pressed;
+                datachannel.send("G" + userNumber + "_B_" + (B ? "P" : "R"));
+              }
+              break
+
+            case 67: // C
+              if (X != pressed) {
+                X = pressed;
+                datachannel.send("G" + userNumber + "_X_" + (X ? "P" : "R"));
+              }
+              break
+
+            case 86: // V
+              if (Y != pressed) {
+                Y = pressed;
+                datachannel.send("G" + userNumber + "_Y_" + (Y ? "P" : "R"));
+              }
+              break
+
+            case 73: // I
+              if (DU != pressed) {
+                DU = pressed;
+                datachannel.send("G" + userNumber + "_DU_" + (DU ? "P" : "R"));
+              }
+              break
+
+            case 74: // J
+              if (DL != pressed) {
+                DL = pressed;
+                datachannel.send("G" + userNumber + "_DL_" + (DL ? "P" : "R"));
+              }
+              break
+
+            case 75: // K
+              if (DD != pressed) {
+                DD = pressed;
+                datachannel.send("G" + userNumber + "_DD_" + (DD ? "P" : "R"));
+              }
+              break
+
+            case 76: // L
+              if (DR != pressed) {
+                DR = pressed;
+                datachannel.send("G" + userNumber + "_DR_" + (DR ? "P" : "R"));
+              }
+              break
           }
         }
 
