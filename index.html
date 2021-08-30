@@ -634,6 +634,34 @@
                 datachannel.send("G" + userNumber + "_DR_" + (DR ? "P" : "R"));
               }
               break
+
+            case 190: // Period/Greater Than
+              if (RT != pressed) {
+                RT = pressed;
+                datachannel.send("G" + userNumber + "_RT_" + (RT ? "P" : "R"));
+              }
+              break
+
+            case 188: // Comma/Less Than
+              if (LT != pressed) {
+                LT = pressed;
+                datachannel.send("G" + userNumber + "_LT_" + (LT ? "P" : "R"));
+              }
+              break
+
+            case 222: // Comma/Quotation Mark
+              if (RB != pressed) {
+                RB = pressed;
+                datachannel.send("G" + userNumber + "_RB_" + (RB ? "P" : "R"));
+              }
+              break
+
+            case 186: // Semicolon/Colon
+              if (LB != pressed) {
+                LB = pressed;
+                datachannel.send("G" + userNumber + "_LB_" + (LB ? "P" : "R"));
+              }
+              break
           }
         }
 
